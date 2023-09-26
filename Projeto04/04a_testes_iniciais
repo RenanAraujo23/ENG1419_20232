@@ -1,0 +1,48 @@
+# importação de bibliotecas
+from gpiozero import Button, LED, Buzzer
+from Adafruit_CharLCD import Adafruit_CharLCD
+from os import system
+from time import sleep
+from requests import post
+
+# parâmetros iniciais do Telegram
+chave = "6578552206:AAF1OKmAKHa9mhyrM59lda1ryE9ycqfvAU8"
+id_da_conversa = "6569313137"
+endereco_base = "https://api.telegram.org/bot" + chave
+
+
+# definição de funções
+def b1_pressionado():
+    lcd.clear()
+    lcd.message("Gravando...")
+    system("arecord --duration 5 audio1.wav")
+    lcd.clear()
+    
+def b2_pressionado():
+    for i in range(5):
+        comando = "fswebcam --resolution 640x480 --skip 10 foto" + str(i)+ ".jpg"
+        print("Foto tirada.\n")
+        l1.blink(n=1, on_time=0.2)
+        system(comando)
+        sleep(2)
+        
+def b3_pressionado():
+    endereco = endereco_base + "/sendMessage"
+    dados = {"chat_id": id_da_conversa, "text": "Botao 3 pressionado"}
+    resposta = post(endereco, json=dados)
+    print(resposta.text)
+        
+        
+
+# criação de componentes
+b1 = Button(11)
+b2 = Button(12)
+b3 = Button(13)
+l1 = LED(21)
+campainha = Buzzer(16)
+lcd = Adafruit_CharLCD(2, 3, 4, 5, 6, 7, 16, 2)
+
+
+b1.when_pressed = b1_pressionado
+b2.when_pressed = b2_pressionado
+b3.when_pressed = b3_pressionado
